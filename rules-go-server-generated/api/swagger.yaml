@@ -1,0 +1,541 @@
+openapi: 3.0.3
+info:
+  title: Rules
+  description: / Rules represents API that is responsible for gathering rules and
+    their statuses.
+  version: 0.0.4
+servers:
+- url: /
+paths:
+  /api/v1/alerts:
+    get:
+      summary: Gets alerts. No parameters will be processed.
+      operationId: Rules_GetRulesAlert
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
+  /api/v1/rules:
+    get:
+      summary: Gets rules. User can pass "rules?type=record" to get rule record instead
+        of full rules.
+      operationId: Rules_GetRules
+      parameters:
+      - name: type
+        in: query
+        description: / The type to request.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleGroups'
+components:
+  schemas:
+    Alert:
+      properties:
+        state:
+          type: integer
+          description: / state returns the maximum state of alert instances for this
+            rule.
+          format: enum
+        name:
+          type: string
+        query:
+          type: string
+        duration_seconds:
+          type: number
+          format: double
+        labels:
+          $ref: '#/components/schemas/ZLabelSet'
+        annotations:
+          $ref: '#/components/schemas/ZLabelSet'
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertInstance'
+        health:
+          type: string
+        last_error:
+          type: string
+        evaluation_duration_seconds:
+          type: number
+          format: double
+        last_evaluation:
+          type: string
+          format: RFC3339
+      example:
+        duration_seconds: 6.027456183070403
+        alerts:
+        - PartialResponseStrategy: 5
+          annotations: null
+          state: 1
+          active_at: active_at
+          value: value
+          labels: null
+        - PartialResponseStrategy: 5
+          annotations: null
+          state: 1
+          active_at: active_at
+          value: value
+          labels: null
+        evaluation_duration_seconds: 5.637376656633329
+        query: query
+        name: name
+        annotations: null
+        health: health
+        last_evaluation: last_evaluation
+        state: 0
+        last_error: last_error
+        labels:
+          labels:
+          - name: name
+            value: value
+          - name: name
+            value: value
+    AlertInstance:
+      properties:
+        labels:
+          $ref: '#/components/schemas/ZLabelSet'
+        annotations:
+          $ref: '#/components/schemas/ZLabelSet'
+        state:
+          type: integer
+          format: enum
+        active_at:
+          type: string
+          format: RFC3339
+        value:
+          type: string
+        PartialResponseStrategy:
+          type: integer
+          description: Thanos specific. Used mainly for alert API purposes.
+          format: enum
+      example:
+        PartialResponseStrategy: 5
+        annotations: null
+        state: 1
+        active_at: active_at
+        value: value
+        labels: null
+    Label:
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+      example:
+        name: name
+        value: value
+    RecordingRule:
+      properties:
+        name:
+          type: string
+        query:
+          type: string
+        labels:
+          $ref: '#/components/schemas/ZLabelSet'
+        health:
+          type: string
+        last_error:
+          type: string
+        evaluation_duration_seconds:
+          type: number
+          format: double
+        last_evaluation:
+          type: string
+          format: RFC3339
+      example:
+        evaluation_duration_seconds: 0.8008281904610115
+        query: query
+        name: name
+        health: health
+        last_evaluation: last_evaluation
+        last_error: last_error
+        labels:
+          labels:
+          - name: name
+            value: value
+          - name: name
+            value: value
+    Rule:
+      properties:
+        recording:
+          $ref: '#/components/schemas/RecordingRule'
+        alert:
+          $ref: '#/components/schemas/Alert'
+      example:
+        alert:
+          duration_seconds: 6.027456183070403
+          alerts:
+          - PartialResponseStrategy: 5
+            annotations: null
+            state: 1
+            active_at: active_at
+            value: value
+            labels: null
+          - PartialResponseStrategy: 5
+            annotations: null
+            state: 1
+            active_at: active_at
+            value: value
+            labels: null
+          evaluation_duration_seconds: 5.637376656633329
+          query: query
+          name: name
+          annotations: null
+          health: health
+          last_evaluation: last_evaluation
+          state: 0
+          last_error: last_error
+          labels:
+            labels:
+            - name: name
+              value: value
+            - name: name
+              value: value
+        recording:
+          evaluation_duration_seconds: 0.8008281904610115
+          query: query
+          name: name
+          health: health
+          last_evaluation: last_evaluation
+          last_error: last_error
+          labels:
+            labels:
+            - name: name
+              value: value
+            - name: name
+              value: value
+    RuleGroup:
+      properties:
+        name:
+          type: string
+        file:
+          type: string
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+        interval:
+          type: number
+          format: double
+        evaluation_duration_seconds:
+          type: number
+          format: double
+        last_evaluation:
+          type: string
+          format: RFC3339
+        PartialResponseStrategy:
+          type: integer
+          description: Thanos specific.
+          format: enum
+      description: / RuleGroup has info for rules which are part of a group.
+      example:
+        file: file
+        evaluation_duration_seconds: 1.4658129805029452
+        PartialResponseStrategy: 5
+        name: name
+        rules:
+        - alert:
+            duration_seconds: 6.027456183070403
+            alerts:
+            - PartialResponseStrategy: 5
+              annotations: null
+              state: 1
+              active_at: active_at
+              value: value
+              labels: null
+            - PartialResponseStrategy: 5
+              annotations: null
+              state: 1
+              active_at: active_at
+              value: value
+              labels: null
+            evaluation_duration_seconds: 5.637376656633329
+            query: query
+            name: name
+            annotations: null
+            health: health
+            last_evaluation: last_evaluation
+            state: 0
+            last_error: last_error
+            labels:
+              labels:
+              - name: name
+                value: value
+              - name: name
+                value: value
+          recording:
+            evaluation_duration_seconds: 0.8008281904610115
+            query: query
+            name: name
+            health: health
+            last_evaluation: last_evaluation
+            last_error: last_error
+            labels:
+              labels:
+              - name: name
+                value: value
+              - name: name
+                value: value
+        - alert:
+            duration_seconds: 6.027456183070403
+            alerts:
+            - PartialResponseStrategy: 5
+              annotations: null
+              state: 1
+              active_at: active_at
+              value: value
+              labels: null
+            - PartialResponseStrategy: 5
+              annotations: null
+              state: 1
+              active_at: active_at
+              value: value
+              labels: null
+            evaluation_duration_seconds: 5.637376656633329
+            query: query
+            name: name
+            annotations: null
+            health: health
+            last_evaluation: last_evaluation
+            state: 0
+            last_error: last_error
+            labels:
+              labels:
+              - name: name
+                value: value
+              - name: name
+                value: value
+          recording:
+            evaluation_duration_seconds: 0.8008281904610115
+            query: query
+            name: name
+            health: health
+            last_evaluation: last_evaluation
+            last_error: last_error
+            labels:
+              labels:
+              - name: name
+                value: value
+              - name: name
+                value: value
+        interval: 6.027456183070403
+        last_evaluation: last_evaluation
+    RuleGroups:
+      properties:
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleGroup'
+      description: "/ RuleGroups is set of rule groups./ This and below APIs are meant\
+        \ to be used for unmarshaling and marshsaling rules from/to Prometheus API./\
+        \ That's why json tag has to be customized and matching https://github.com/prometheus/prometheus/blob/c530b4b456cc5f9ec249f771dff187eb7715dc9b/web/api/v1/api.go#L955/\
+        \ NOTE: See rules_custom_test.go for compatibility tests.// For rule parsing\
+        \ from YAML configuration other struct is used: https://github.com/prometheus/prometheus/blob/20b1f596f6fb16107ef0c244d240b0ad6da36829/pkg/rulefmt/rulefmt.go#L105"
+      example:
+        groups:
+        - file: file
+          evaluation_duration_seconds: 1.4658129805029452
+          PartialResponseStrategy: 5
+          name: name
+          rules:
+          - alert:
+              duration_seconds: 6.027456183070403
+              alerts:
+              - PartialResponseStrategy: 5
+                annotations: null
+                state: 1
+                active_at: active_at
+                value: value
+                labels: null
+              - PartialResponseStrategy: 5
+                annotations: null
+                state: 1
+                active_at: active_at
+                value: value
+                labels: null
+              evaluation_duration_seconds: 5.637376656633329
+              query: query
+              name: name
+              annotations: null
+              health: health
+              last_evaluation: last_evaluation
+              state: 0
+              last_error: last_error
+              labels:
+                labels:
+                - name: name
+                  value: value
+                - name: name
+                  value: value
+            recording:
+              evaluation_duration_seconds: 0.8008281904610115
+              query: query
+              name: name
+              health: health
+              last_evaluation: last_evaluation
+              last_error: last_error
+              labels:
+                labels:
+                - name: name
+                  value: value
+                - name: name
+                  value: value
+          - alert:
+              duration_seconds: 6.027456183070403
+              alerts:
+              - PartialResponseStrategy: 5
+                annotations: null
+                state: 1
+                active_at: active_at
+                value: value
+                labels: null
+              - PartialResponseStrategy: 5
+                annotations: null
+                state: 1
+                active_at: active_at
+                value: value
+                labels: null
+              evaluation_duration_seconds: 5.637376656633329
+              query: query
+              name: name
+              annotations: null
+              health: health
+              last_evaluation: last_evaluation
+              state: 0
+              last_error: last_error
+              labels:
+                labels:
+                - name: name
+                  value: value
+                - name: name
+                  value: value
+            recording:
+              evaluation_duration_seconds: 0.8008281904610115
+              query: query
+              name: name
+              health: health
+              last_evaluation: last_evaluation
+              last_error: last_error
+              labels:
+                labels:
+                - name: name
+                  value: value
+                - name: name
+                  value: value
+          interval: 6.027456183070403
+          last_evaluation: last_evaluation
+        - file: file
+          evaluation_duration_seconds: 1.4658129805029452
+          PartialResponseStrategy: 5
+          name: name
+          rules:
+          - alert:
+              duration_seconds: 6.027456183070403
+              alerts:
+              - PartialResponseStrategy: 5
+                annotations: null
+                state: 1
+                active_at: active_at
+                value: value
+                labels: null
+              - PartialResponseStrategy: 5
+                annotations: null
+                state: 1
+                active_at: active_at
+                value: value
+                labels: null
+              evaluation_duration_seconds: 5.637376656633329
+              query: query
+              name: name
+              annotations: null
+              health: health
+              last_evaluation: last_evaluation
+              state: 0
+              last_error: last_error
+              labels:
+                labels:
+                - name: name
+                  value: value
+                - name: name
+                  value: value
+            recording:
+              evaluation_duration_seconds: 0.8008281904610115
+              query: query
+              name: name
+              health: health
+              last_evaluation: last_evaluation
+              last_error: last_error
+              labels:
+                labels:
+                - name: name
+                  value: value
+                - name: name
+                  value: value
+          - alert:
+              duration_seconds: 6.027456183070403
+              alerts:
+              - PartialResponseStrategy: 5
+                annotations: null
+                state: 1
+                active_at: active_at
+                value: value
+                labels: null
+              - PartialResponseStrategy: 5
+                annotations: null
+                state: 1
+                active_at: active_at
+                value: value
+                labels: null
+              evaluation_duration_seconds: 5.637376656633329
+              query: query
+              name: name
+              annotations: null
+              health: health
+              last_evaluation: last_evaluation
+              state: 0
+              last_error: last_error
+              labels:
+                labels:
+                - name: name
+                  value: value
+                - name: name
+                  value: value
+            recording:
+              evaluation_duration_seconds: 0.8008281904610115
+              query: query
+              name: name
+              health: health
+              last_evaluation: last_evaluation
+              last_error: last_error
+              labels:
+                labels:
+                - name: name
+                  value: value
+                - name: name
+                  value: value
+          interval: 6.027456183070403
+          last_evaluation: last_evaluation
+    ZLabelSet:
+      properties:
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+      example:
+        labels:
+        - name: name
+          value: value
+        - name: name
+          value: value
